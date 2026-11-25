@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<title>PR-PCV-BRL-01 · Atualização da relação MM ↔ Braille</title>
+<style>
+@page { size: A4; margin: 16mm 16mm 18mm; }
+* { box-sizing: border-box; }
+body { font-family: "IBM Plex Sans", "Segoe UI", Arial, sans-serif; font-size: 10.5pt; line-height: 1.45; color: #1d1d1b; margin: 0; }
+.head { display: grid; grid-template-columns: 52mm 1fr 44mm; border: 1px solid #b9c3bc; }
+.head > div { padding: 3mm 4mm; border-right: 1px solid #b9c3bc; }
+.head > div:last-child { border-right: 0; font-size: 8.5pt; }
+.head img { height: 9mm; }
+.head h1 { font-size: 13pt; margin: 0; color: #176939; }
+.head p { margin: 1mm 0 0; font-size: 9pt; color: #4b524d; }
+.head table { width: 100%; border-collapse: collapse; }
+.head td { padding: .4mm 0; }
+.head td:first-child { color: #6c746e; }
+h2 { font-size: 11.5pt; color: #176939; margin: 6mm 0 2mm; padding-bottom: 1mm; border-bottom: 1.5px solid #176939; }
+h3 { font-size: 10.5pt; margin: 4mm 0 1.5mm; }
+p { margin: 0 0 2mm; }
+ol, ul { margin: 0 0 2mm; padding-left: 6mm; }
+li { margin-bottom: 1.2mm; }
+table.t { width: 100%; border-collapse: collapse; margin: 2mm 0 3mm; font-size: 9.5pt; }
+table.t th, table.t td { border: 1px solid #c9d2cb; padding: 1.6mm 2.4mm; text-align: left; vertical-align: top; }
+table.t th { background: #eaf3ed; color: #176939; font-weight: 600; }
+.fill { background: #fdf5d8; border: 1px dashed #c9a227; padding: 0 1.5mm; border-radius: 1mm; color: #6b4e00; font-weight: 600; }
+.box { border: 1px solid #c9e0d0; background: #f3f9f5; border-radius: 2mm; padding: 3mm 4mm; margin: 2mm 0 3mm; }
+.warn { border-color: #ecd486; background: #fdf8e6; }
+code { font-family: "IBM Plex Mono", Consolas, monospace; font-size: 9pt; background: #f1f3f1; padding: 0 1mm; border-radius: 1mm; }
+.step { display: grid; grid-template-columns: 8mm 1fr; gap: 2mm; margin-bottom: 2.5mm; break-inside: avoid; }
+.step b.n { display: inline-grid; place-items: center; width: 6.5mm; height: 6.5mm; border-radius: 50%; background: #176939; color: #fff; font-size: 9pt; }
+.sign { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid #b9c3bc; margin-top: 6mm; break-inside: avoid; }
+.sign div { padding: 2.5mm 3mm 10mm; border-right: 1px solid #b9c3bc; font-size: 9pt; color: #4b524d; }
+.sign div:last-child { border-right: 0; }
+.foot { margin-top: 5mm; font-size: 8pt; color: #6c746e; }
+</style>
+</head>
+<body>
+<div class="head">
+  <div><img src="../assets/logo.png" alt="Hinojosa"></div>
+  <div><h1>Atualização da relação MM ↔ Braille</h1><p>Procedimento · Setor PCV · App Braille PCV</p></div>
+  <div><table>
+    <tr><td>Código</td><td><b>PR-PCV-BRL-01</b></td></tr>
+    <tr><td>Revisão</td><td>00</td></tr>
+    <tr><td>Data</td><td>25/11/2026</td></tr>
+    <tr><td>Páginas</td><td>3</td></tr>
+  </table></div>
+</div>
+
+<h2>1. Objetivo</h2>
+<p>Manter atualizada a relação entre os materiais (MM, códigos <code>8000…</code>) e os códigos de braille (<code>1300…</code>) usada pela app Braille PCV. É esta relação que diz à app qual o PDF de braille aprovado que deve ser comparado com a caixa produzida.</p>
+<p>A relação passa a vir do SAP e não do nome dos PDFs: o mesmo braille pode ser criado para um material e usado depois noutro sem que o nome do ficheiro seja alterado.</p>
+
+<h2>2. Âmbito e responsabilidades</h2>
+<table class="t">
+  <tr><th style="width:28%">Perfil</th><th>Responsabilidade</th></tr>
+  <tr><td>Supervisor</td><td>Extrair o ficheiro do SAP e carregá-lo na app dentro do prazo. Atualizar a lista de PDFs quando forem criados novos brailles.</td></tr>
+  <tr><td>Manager</td><td>Definir o prazo máximo entre atualizações (1 a 30 dias) e quem recebe o email de lembrete. Gerir os utilizadores da app.</td></tr>
+  <tr><td>Operador</td><td>Usar a relação para verificar caixas. Avisar o Supervisor quando a app mostrar o aviso “fora do prazo”.</td></tr>
+</table>
+
+<h2>3. Frequência e lembrete automático</h2>
+<ul>
+  <li>O prazo máximo entre atualizações é definido pelo Manager na app (separador <b>Definições</b>), entre 1 e 30 dias. Valor atual: <span class="fill">____ dias</span>.</li>
+  <li>Todos os dias de manhã, o GitHub verifica a data da última atualização. Se o prazo tiver sido ultrapassado, envia um email aos destinatários definidos e repete-o todos os dias até o ficheiro ser carregado.</li>
+  <li>Enquanto estiver fora do prazo, a app mostra um aviso vermelho a todos os utilizadores.</li>
+  <li>Atualizar também, fora do prazo, sempre que um braille novo for associado a um material ou um braille deixar de ser usado.</li>
+</ul>
+
+<h2>4. Extração do ficheiro no SAP</h2>
+<div class="box warn"><b>A completar pelo responsável SAP antes de aprovar este procedimento:</b> a transação ou relatório usado e a variante de seleção.</div>
+<div class="step"><b class="n">1</b><div>Entrar no SAP e abrir a transação <span class="fill">__________</span> (relatório <span class="fill">__________</span>).</div></div>
+<div class="step"><b class="n">2</b><div>Selecionar a variante <span class="fill">__________</span>, que lista todos os materiais com o componente de braille. Não filtrar por data nem por cliente: o ficheiro tem de ter a <b>lista completa</b>.</div></div>
+<div class="step"><b class="n">3</b><div>Executar e exportar para Excel (<i>Lista › Exportar › Folha de cálculo</i>, formato <code>.xlsx</code>). Guardar com o nome <code>Relacao_MM_Braille_AAAA-MM-DD.xlsx</code>.</div></div>
+
+<h3>Conteúdo obrigatório do ficheiro</h3>
+<table class="t">
+  <tr><th style="width:30%">Coluna</th><th style="width:22%">Exemplo</th><th>Notas</th></tr>
+  <tr><td>Material (MM)</td><td><code>8000020749</code></td><td>Obrigatória. Pode vir com zeros à esquerda (<code>000000008000020749</code>); a app remove-os.</td></tr>
+  <tr><td>Código de braille</td><td><code>130008199</code></td><td>Obrigatória. Um material com dois brailles ocupa duas linhas.</td></tr>
+  <tr><td>Descrição do material</td><td>CX AUCHAN ATUN CLARO</td><td>Opcional, mas recomendada: aparece na pesquisa e na Biblioteca.</td></tr>
+</table>
+<ul>
+  <li>Uma linha por par material – braille, com os títulos das colunas na primeira linha.</li>
+  <li>Linhas de totais, vazias ou sem códigos numéricos são ignoradas pela app e indicadas na pré-visualização.</li>
+  <li>Outras colunas podem ficar no ficheiro: a app só usa as que forem escolhidas.</li>
+</ul>
+
+<h2>5. Carregar o ficheiro na app</h2>
+<div class="step"><b class="n">1</b><div>Abrir a app Braille PCV e entrar com um utilizador <b>Supervisor</b> ou <b>Manager</b>.</div></div>
+<div class="step"><b class="n">2</b><div>Abrir o separador <b>Atualização</b> e, em “Carregar ficheiro do SAP”, escolher ou arrastar o Excel exportado.</div></div>
+<div class="step"><b class="n">3</b><div>Confirmar as colunas detetadas: <b>MM</b>, <b>código de braille</b> e, se existir, <b>descrição</b>. Se a app não as encontrar sozinha, escolhê-las nas listas.</div></div>
+<div class="step"><b class="n">4</b><div>Rever a pré-visualização:
+  <ul>
+    <li>número de pares, de MM e de códigos de braille;</li>
+    <li><b>Novos MM</b>, <b>MM removidos</b> e <b>Braille alterado</b> em relação à versão anterior. Confirmar que as alterações fazem sentido, sobretudo os brailles alterados;</li>
+    <li>linhas ignoradas e avisos. Se o ficheiro tiver menos de metade das linhas da relação atual, a app pede confirmação: normalmente significa que a exportação ficou incompleta.</li>
+  </ul></div></div>
+<div class="step"><b class="n">5</b><div>Carregar em <b>Publicar atualização</b>. A data da última atualização passa a ser a de hoje, o aviso desaparece e o lembrete por email para.</div></div>
+<div class="step"><b class="n">6</b><div>Confirmar no cartão “Estado da relação SAP” que aparecem <b>0 dias</b>, o seu nome e o ficheiro carregado.</div></div>
+
+<h2>6. Lista de PDFs (quando houver brailles novos)</h2>
+<p>No separador Atualização, em “Lista de PDFs”, escolher a pasta <code>11 - PCV\00 - BRAILLES</code> (sincronizada pelo OneDrive) e carregar em <b>Guardar lista de PDFs</b>. Só os nomes dos ficheiros são guardados. O nome de cada PDF tem de conter o código de braille <code>1300…</code>.</p>
+
+<h2>7. Problemas frequentes</h2>
+<table class="t">
+  <tr><th style="width:38%">Situação</th><th>O que fazer</th></tr>
+  <tr><td>“Não consegui identificar a coluna do MM / do braille”</td><td>Escolher as colunas manualmente nas listas. Confirmar que a exportação tem os códigos numéricos e não apenas descrições.</td></tr>
+  <tr><td>Muitas linhas ignoradas</td><td>Ver os números das linhas indicados. Normalmente são totais ou linhas sem componente; se forem materiais válidos, rever a exportação.</td></tr>
+  <tr><td>“Muito menos linhas do que a relação atual”</td><td>Repetir a exportação sem filtros. Só confirmar se a redução for esperada.</td></tr>
+  <tr><td>Erro de token ou de permissão ao publicar</td><td>Pedir ao Manager para recriar o utilizador. O token pode ter expirado.</td></tr>
+  <tr><td>O email de lembrete continua a chegar</td><td>Confirmar que a publicação terminou sem erro e que o cartão de estado mostra 0 dias.</td></tr>
+</table>
+
+<h2>8. Registos</h2>
+<p>Cada atualização fica registada no repositório de dados da app: o ficheiro Excel original (pasta <code>historico/</code>), a data, o utilizador e as diferenças (novos, removidos e alterados). O histórico das últimas atualizações também aparece no separador Atualização.</p>
+
+<div class="sign">
+  <div>Elaborado por:</div>
+  <div>Verificado por:</div>
+  <div>Aprovado por:</div>
+</div>
+<p class="foot">PR-PCV-BRL-01 · Rev. 00 · Documento controlado apenas na versão publicada na app Braille PCV.</p>
+</body>
+</html>
