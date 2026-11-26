@@ -38,6 +38,16 @@
  "users": [
   {
    "v": 2,
+   "u": "e00321",
+   "name": "Janete Gomes",
+   "role": "manager",
+   "salt": "OprcRGOqk5yUie9rMCaeOg==",
+   "iv": "c6LFMrXs8pIf0fLG",
+   "ct": "uYw1F4/0If1kwFn37Ulv6U4fhr7jhJWlk6ucqVPCVLANrpBL+nt72QDtZKl2wGfH9UgJf1bnRgtd18NNec5R66JoB7PgeZOXDctRmseI8Lbi0EaPwBJn/O08PFPvMDi2YUI9ab8pWLgs/dqgj0Op5Uv9eSEzLsyQSUzzm9Op2cB0tXgY3qLYsOaOoiBskXpHriHskcnB5xGY+5puo3tyXVQ+NNbDPo86ZrvKbWQRX97T9b/yuMInXPheP+uMAiuCNtQ5GqETjupQxf5gKXjXTXWabueujFLboX+wUrd3qH/rKVC8JVcePJ467XsAVPJopwp5ebvzuDtySFZf98XlDe2hWM413QQrggZHDB/u8y13Eu3bw2NhN3egHEtL5g==",
+   "created": "2026-11-26T19:06:51.916Z"
+  },
+  {
+   "v": 2,
    "u": "e00629",
    "name": "David Malheiro",
    "role": "manager",
