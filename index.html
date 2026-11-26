@@ -29,6 +29,7 @@
         <button data-view="biblioteca">Biblioteca</button>
         <button data-view="como">Como funciona</button>
         <button data-view="atualizacao">Atualização</button>
+        <button data-view="registo">Registo</button>
         <button data-view="definicoes">Definições</button>
       </nav>
     </div>
@@ -42,7 +43,7 @@
 
 <main class="wrap">
 <div class="empty-res" id="boot"><span class="spinner"></span>A carregar a Braille PCV…</div>
-<div class="banner" id="banner" hidden></div>
+<div class="banners" id="banner" hidden></div>
 
 <!-- ================= LOGIN ================= -->
 <section class="view" id="v-login" hidden>
@@ -75,7 +76,7 @@
         <div class="row2"><label>Palavra-passe (mín. 10 caracteres)<input id="su-p1" type="password" autocomplete="new-password" required></label><label>Confirmar<input id="su-p2" type="password" autocomplete="new-password" required></label></div>
         <label>Token Manager (dados + app + Actions)<input id="su-ta" type="password" required></label>
         <label>Token Supervisor (escrita nos dados)<input id="su-tw" type="password" required></label>
-        <label>Token Operador (só leitura dos dados)<input id="su-tr" type="password" required></label>
+        <label>Token Operador (leitura dos dados e registo das verificações)<input id="su-tr" type="password" required></label>
         <button class="btn primary" type="submit" id="su-btn">Criar e entrar</button>
         <p class="err" id="su-err" hidden></p>
       </form>
@@ -88,20 +89,74 @@
   <div class="pills">
     <button class="pill" data-go="biblioteca"><b class="num" id="p-mm">0</b><span>MM na relação SAP</span></button>
     <button class="pill blue" data-go="biblioteca"><b class="num" id="p-codes">0</b><span>Códigos braille</span></button>
-    <button class="pill amber" data-go="biblioteca" data-filter="sempdf"><b class="num" id="p-sempdf">0</b><span>sem PDF</span></button>
-    <button class="pill grey" data-go="verificar"><b class="num" id="p-ver">0</b><span>Verificações</span></button>
+    <button class="pill grey" data-go="verificar"><b class="num" id="p-ver">0</b><span>Verificações neste dispositivo</span></button>
     <button class="link" data-go="como">› como funciona</button>
   </div>
-  <div class="card">
-    <form class="search" id="home-search">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-      <input id="home-q" type="text" placeholder="Procura um MM, código de braille ou descrição" aria-label="Procurar">
-      <button class="btn" type="submit">Procurar</button>
-    </form>
-    <div class="chips">
-      <button class="chip" data-filter-go="sempdf">sem PDF</button>
-      <button class="chip" data-filter-go="multi">MM com vários brailles</button>
-      <button class="chip" data-filter-go="partilhado">braille usado em vários MM</button>
+  <div class="card" id="foto-card">
+    <h2>Como tirar a foto</h2>
+    <div class="figure" style="margin-top:14px">
+      <svg viewBox="0 0 640 360" role="img" aria-label="Telemóvel a 90 graus por cima do verso da caixa, com uma luz baixa de lado; do verso, cada ponto de braille é uma cova que faz sombra">
+        <!-- cartão visto de lado: o verso está virado para a câmara, o relevo fica por baixo -->
+        <rect x="60" y="270" width="520" height="24" rx="3" fill="var(--kraft)"/>
+        <!-- covas no verso (lado virado para a câmara) -->
+        <g fill="var(--bg)">
+          <path d="M282 270 a14 12 0 0 0 28 0 z"/>
+          <path d="M326 270 a14 12 0 0 0 28 0 z"/>
+          <path d="M370 270 a14 12 0 0 0 28 0 z"/>
+        </g>
+        <!-- sombra dentro de cada cova (do lado da luz) -->
+        <g fill="var(--ink)" opacity=".55">
+          <path d="M282 270 a14 12 0 0 0 9 10 l5 -10 z"/>
+          <path d="M326 270 a14 12 0 0 0 9 10 l5 -10 z"/>
+          <path d="M370 270 a14 12 0 0 0 9 10 l5 -10 z"/>
+        </g>
+        <g fill="none" stroke="var(--ink-2)" stroke-width="1.5">
+          <path d="M282 270 a14 12 0 0 0 28 0"/>
+          <path d="M326 270 a14 12 0 0 0 28 0"/>
+          <path d="M370 270 a14 12 0 0 0 28 0"/>
+        </g>
+        <!-- relevo por baixo (lado de fora da caixa) -->
+        <g fill="var(--kraft)" stroke="var(--ink-2)" stroke-width="1.5">
+          <path d="M282 294 a14 12 0 0 0 28 0"/>
+          <path d="M326 294 a14 12 0 0 0 28 0"/>
+          <path d="M370 294 a14 12 0 0 0 28 0"/>
+        </g>
+        <text x="570" y="262" text-anchor="end" font-size="15" fill="var(--muted)" font-family="var(--sans)">verso (lado de dentro)</text>
+        <text x="420" y="330" font-size="15" fill="var(--muted)" font-family="var(--sans)">relevo (lado de fora)</text>
+        <path d="M416 325 L398 304" stroke="var(--muted)" stroke-width="1.5"/>
+        <!-- telemóvel -->
+        <rect x="270" y="26" width="140" height="26" rx="7" fill="var(--ink)"/>
+        <rect x="328" y="52" width="24" height="8" rx="2" fill="var(--ink-2)"/>
+        <text x="424" y="45" font-size="17" fill="var(--ink)" font-family="var(--sans)" font-weight="600">telemóvel</text>
+        <!-- eixo da câmara -->
+        <line x1="340" y1="62" x2="340" y2="256" stroke="var(--green)" stroke-width="3" stroke-dasharray="8 7"/>
+        <path d="M340 238 h18 v18" fill="none" stroke="var(--green)" stroke-width="3"/>
+        <text x="366" y="230" font-size="28" fill="var(--green)" font-family="var(--mono)" font-weight="600">90º</text>
+        <text x="354" y="150" font-size="16" fill="var(--green)" font-family="var(--sans)">câmara paralela</text>
+        <text x="354" y="170" font-size="16" fill="var(--green)" font-family="var(--sans)">ao cartão</text>
+        <!-- luz lateral -->
+        <g transform="rotate(-16 80 232)">
+          <rect x="34" y="220" width="66" height="26" rx="6" fill="var(--amber)"/>
+          <rect x="98" y="214" width="10" height="38" rx="3" fill="var(--amber)"/>
+        </g>
+        <g stroke="var(--amber)" stroke-width="2.5" stroke-linecap="round">
+          <path d="M120 228 L300 268" opacity=".95"/>
+          <path d="M120 240 L344 270" opacity=".75"/>
+          <path d="M120 218 L250 246" opacity=".55"/>
+        </g>
+        <path d="M222 270 A 66 66 0 0 0 220 252" fill="none" stroke="var(--amber)" stroke-width="2"/>
+        <text x="24" y="146" font-size="18" fill="var(--amber)" font-family="var(--sans)" font-weight="600">luz de lado, baixa</text>
+        <text x="24" y="170" font-size="16" fill="var(--amber)" font-family="var(--mono)" font-weight="600">15–30º do cartão</text>
+        <text x="452" y="214" font-size="15" fill="var(--muted)" font-family="var(--sans)">cada ponto é uma</text>
+        <text x="452" y="232" font-size="15" fill="var(--muted)" font-family="var(--sans)">cova com sombra</text>
+        <path d="M448 236 L392 272" stroke="var(--muted)" stroke-width="1.5"/>
+      </svg>
+      <ul>
+        <li>Fotografe o <b>verso</b> (o lado de dentro da caixa): os pontos aparecem como covas. Escolha “Verso” na app.</li>
+        <li><b>Telemóvel a 90º</b> da caixa, paralelo ao cartão. Fotos inclinadas dão “Inconclusivo”.</li>
+        <li><b>Luz de lado e baixa</b> (lanterna, candeeiro ou janela lateral), para cada ponto fazer sombra. Evite a luz de frente e o flash.</li>
+        <li><b>Braille grande na foto</b>: aproxime até o braille ocupar boa parte do ecrã, sem desfocar.</li>
+      </ul>
     </div>
   </div>
   <div class="card hero">
@@ -130,6 +185,7 @@
       <div class="hist" id="hist" style="margin-top:8px"></div>
     </div>
   </div>
+  <p class="credits">Ideia: Janete Gomes · Criado por: David Malheiro</p>
 </section>
 
 <!-- ================= VERIFICAR ================= -->
@@ -137,22 +193,26 @@
   <div class="steps">
     <div class="col">
       <div class="card">
-        <div class="step-h"><span class="n" id="n1">1</span><h2>Braille aprovado</h2></div>
+        <div class="step-h"><span class="n" id="n1">1</span><h2>Braille aprovado</h2>
+          <div class="seg mode" id="mode-seg" role="group" aria-label="O que vai verificar"><button data-mode="caixa" aria-pressed="true">Caixa</button><button data-mode="macho" aria-pressed="false">Macho</button></div></div>
+        <div id="macho-ctx" hidden></div>
         <form class="field" id="mm-form">
           <input id="mm-in" type="text" inputmode="numeric" placeholder="MM do produto, ex.: 8000020749" aria-label="MM do produto">
           <button class="btn" type="submit">Procurar</button>
+          <button class="btn" type="button" id="of-btn" title="Fotografe a ordem de fabrico: a app lê o MM e o braille">Ler OF</button>
         </form>
+        <div id="of-out"></div>
         <div id="mm-out"></div>
         <div class="drop" id="pdf-drop" style="margin-top:14px">
           <span class="fn" id="pdf-name">Arrasta para aqui o PDF do braille ou escolhe o ficheiro.</span>
           <div class="row">
             <label class="btn" for="pdf-in">Carregar PDF</label>
-            <label class="btn" for="folder-in" title="Escolha a pasta 00 - BRAILLES uma vez; a app passa a abrir o PDF certo sozinha">Ligar pasta</label>
+            <button class="btn" type="button" id="folder-btn" title="Escolha a pasta 00 - BRAILLES uma vez; a app passa a abrir o PDF certo sozinha">Ligar pasta</button>
           </div>
           <input id="pdf-in" type="file" accept="application/pdf,.pdf" hidden>
           <input id="folder-in" type="file" webkitdirectory directory multiple hidden>
         </div>
-        <p class="hint" style="margin-top:8px" id="folder-hint">Dica: em computador, use <b>Ligar pasta</b> e escolha a pasta 00 - BRAILLES (OneDrive). A app abre o PDF certo sozinha. Os ficheiros não saem do computador.</p>
+        <p class="hint" style="margin-top:8px" id="folder-hint">Em tablets e telemóveis basta o MM: a app usa os padrões sincronizados dos PDFs. Em computador, use <b>Ligar pasta</b> uma vez e escolha a pasta 00 - BRAILLES.</p>
         <div id="pdf-check"></div>
         <div class="pattern-box" id="pattern-box" hidden>
           <canvas id="pat-cv" height="160"></canvas>
@@ -163,9 +223,13 @@
         <div class="step-h"><span class="n" id="n2">2</span><h2>Foto do braille</h2></div>
         <div class="drop" id="img-drop">
           <span class="fn" id="img-name">Foto tirada ao verso da caixa, a 90º e com luz de lado.</span>
-          <label class="btn" for="img-in">Tirar / carregar foto</label>
-          <input id="img-in" type="file" accept="image/*" capture="environment" hidden>
+          <div class="row">
+            <button class="btn primary" type="button" id="cam-btn">Abrir câmara</button>
+            <label class="btn" for="img-in">Escolher foto</label>
+          </div>
+          <input id="img-in" type="file" accept="image/*" hidden>
         </div>
+        <p class="hint" id="img-warn" hidden></p>
         <div class="row" style="margin-top:14px">
           <span class="hint">Lado fotografado</span>
           <div class="seg" role="group" aria-label="Lado fotografado">
@@ -177,7 +241,7 @@
         <ul class="hint" style="margin:12px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:4px">
           <li>Telemóvel a 90º do cartão (paralelo à caixa).</li>
           <li>Luz rasante de um dos lados, para os pontos fazerem sombra.</li>
-          <li>Depois da foto, desenha um retângulo à volta do braille, com pouca margem.</li>
+          <li>Com <b>Abrir câmara</b>, encaixe o braille na moldura: a zona fica marcada sozinha. Com uma foto da galeria, desenhe um retângulo à volta do braille.</li>
         </ul>
       </div>
     </div>
@@ -197,6 +261,7 @@
       <div class="card" id="res-card">
         <div class="step-h"><span class="n" id="n4">4</span><h2>Resultado</h2></div>
         <div id="res"><div class="empty-res">Ainda sem comparação.<br><br><button class="btn" id="btn-demo" hidden>Carregar exemplo S2127A</button></div></div>
+        <p class="hint" id="log-status" style="margin-top:12px" hidden></p>
       </div>
     </div>
   </div>
@@ -215,7 +280,9 @@
       <button class="chip" data-f="sempdf" aria-pressed="false">Sem PDF</button>
       <button class="chip" data-f="multi" aria-pressed="false">MM com vários brailles</button>
       <button class="chip" data-f="partilhado" aria-pressed="false">Braille usado em vários MM</button>
+      <button class="chip" type="button" data-folder title="Escolha a pasta 00 - BRAILLES para ver que PDFs existem">Ligar pasta dos PDFs</button>
     </div>
+    <div class="row" style="margin-top:12px"><span class="hint" id="pat-status"></span><button class="btn small" id="pat-sync" hidden>Sincronizar padrões</button></div>
   </div>
   <div class="row between"><span class="hint" id="lib-count"></span><span class="hint" id="lib-src"></span></div>
   <div class="tablewrap"><table>
@@ -234,13 +301,13 @@
     </div>
     <div class="card">
       <h2>Procedimento</h2>
-      <p class="lead" style="margin-top:8px">PR-PCV-BRL-01 · Atualização da relação MM ↔ Braille. Explica como extrair o ficheiro do SAP, que colunas tem de ter e como o carregar aqui.</p>
+      <p class="lead" style="margin-top:8px">PLM009.CV-Atualização de relação MM-Braille na APP - 26W47. Explica como extrair o ficheiro do SAP (IH09), que colunas tem de ter e como o carregar aqui.</p>
       <div class="row" style="margin-top:14px"><a class="btn primary" href="docs/procedimento-atualizacao.pdf" target="_blank" rel="noopener">Abrir procedimento (PDF)</a></div>
     </div>
   </div>
   <div class="card">
     <h2>Carregar ficheiro do SAP</h2>
-    <p class="hint" style="margin-top:6px">Excel (.xlsx, .xls) ou .csv. Uma linha por par MM – código de braille. A app deteta as colunas; confirme antes de publicar.</p>
+    <p class="hint" style="margin-top:6px">Excel exportado da IH09 com as colunas Objeto, Denominação e Braille. A app deteta as colunas e ignora os materiais sem braille; confirme antes de publicar.</p>
     <div class="drop" id="sap-drop" style="margin-top:14px">
       <span class="fn" id="sap-name">Arrasta para aqui o Excel exportado do SAP.</span>
       <label class="btn" for="sap-in">Escolher ficheiro</label>
@@ -248,18 +315,54 @@
     </div>
     <div id="sap-preview"></div>
   </div>
+  <div class="card">
+    <h2>Histórico de atualizações</h2>
+    <div class="hist" id="up-hist" style="margin-top:8px"></div>
+  </div>
+</section>
+
+<!-- ================= REGISTO (Supervisor e Manager) ================= -->
+<section class="view" id="v-registo" hidden>
+  <div class="card" id="rep-card">
+    <div class="row between"><h2>Relatório diário</h2><div class="chips" id="rep-days" style="margin:0"></div></div>
+    <p class="hint" style="margin-top:4px">Das 6h do dia útil anterior às 6h do dia (à segunda-feira cobre desde sexta às 6h). Fins de semana e dias de fecho não têm relatório. É criado quando a app é aberta.</p>
+    <div id="rep-body" style="margin-top:12px"></div>
+  </div>
   <div class="grid2">
     <div class="card">
-      <h2>Lista de PDFs</h2>
-      <p class="hint" style="margin-top:6px">Atualiza a lista de ficheiros da pasta 00 - BRAILLES usada na Biblioteca (coluna “PDF na pasta”). Só os nomes são guardados.</p>
-      <div class="row" style="margin-top:14px"><label class="btn" for="pdfs-in">Escolher pasta 00 - BRAILLES</label><input id="pdfs-in" type="file" webkitdirectory directory multiple hidden></div>
-      <div id="pdfs-out" style="margin-top:12px"></div>
+      <h2>Registo de verificações</h2>
+      <div class="status-big" id="rg-status" style="margin-top:14px"></div>
+      <div class="meta" id="rg-meta" style="margin-top:12px"></div>
+      <div class="row" style="margin-top:16px">
+        <button class="btn primary" id="rg-export">Exportar Excel</button>
+        <button class="btn" id="rg-close">Fechar e começar novo registo</button>
+      </div>
+      <p class="hint" id="rg-msg" style="margin-top:10px"></p>
     </div>
     <div class="card">
-      <h2>Histórico de atualizações</h2>
-      <div class="hist" id="up-hist" style="margin-top:8px"></div>
+      <h2>Registos anteriores</h2>
+      <p class="hint" style="margin-top:4px">Cada registo fechado fica guardado no repositório de dados.</p>
+      <div class="hist" id="rg-arch" style="margin-top:8px"></div>
     </div>
   </div>
+  <div class="card">
+    <form class="search" id="rg-search">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="rg-q" type="text" placeholder="MM, código de braille, ficheiro, utilizador ou notas" aria-label="Filtrar registo">
+    </form>
+    <div class="chips" id="rg-filters">
+      <button class="chip" data-r="" aria-pressed="true">Todos</button>
+      <button class="chip" data-r="NOK" aria-pressed="false">NOK</button>
+      <button class="chip" data-r="A CONFIRMAR" aria-pressed="false">A confirmar</button>
+      <button class="chip" data-r="INCONCLUSIVO" aria-pressed="false">Inconclusivo</button>
+      <button class="chip" data-r="OK" aria-pressed="false">OK</button>
+    </div>
+  </div>
+  <div class="row between"><span class="hint" id="rg-count"></span></div>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Data</th><th>MM</th><th>Código braille</th><th>Ficheiro</th><th>Utilizador</th><th>Resultado</th><th>Notas</th><th>Tipo</th><th>Foto</th></tr></thead>
+    <tbody id="rg-body"></tbody>
+  </table></div>
 </section>
 
 <!-- ================= DEFINIÇÕES (Manager) ================= -->
@@ -273,8 +376,10 @@
         </label>
         <label>Enviar o email para (um ou mais, separados por vírgula)<textarea id="set-emails" placeholder="nome@hinojosagroup.com"></textarea></label>
         <label>Link da app (vai no email)<input id="set-url" type="text"></label>
+        <label>Dias de fecho além dos feriados (AAAA-MM-DD, separados por vírgula)<textarea id="set-hol" placeholder="2026-08-14, 2026-12-26"></textarea></label>
+        <p class="hint" id="hol-prev"></p>
         <div class="row"><button class="btn primary" type="submit">Guardar definições</button><button class="btn" type="button" id="set-test">Enviar email de teste</button></div>
-        <p class="hint">O GitHub verifica o prazo todos os dias de manhã (06:00 UTC: 06:00 em Lisboa no inverno, 07:00 no verão) e envia o email enquanto a relação estiver fora do prazo.</p>
+        <p class="hint">A app verifica o prazo todos os dias de manhã (06:00 UTC: 06:00 em Lisboa no inverno, 07:00 no verão) e envia o email enquanto a relação estiver fora do prazo.</p>
         <p id="set-msg" hidden></p>
       </form>
     </div>
@@ -282,6 +387,18 @@
       <h2>Pré-visualização do email</h2>
       <div class="mail" id="mail-prev" style="margin-top:12px"></div>
     </div>
+  </div>
+  <div class="card" id="vault-card">
+    <h2>Cofre de tokens</h2>
+    <p class="hint" style="margin-top:6px">Quando um token do GitHub expirar, crie um novo com as mesmas permissões e cole-o aqui. Os utilizadores continuam a entrar com a mesma palavra-passe. Deixe em branco os que não mudam.</p>
+    <div class="meta" id="vault-meta" style="margin-top:12px"></div>
+    <form class="form" id="vault-form" style="margin-top:14px">
+      <div class="row2"><label>Token Operador (novo)<input id="vt-r" type="password" autocomplete="off"></label><label>Expira em<input id="vt-re" type="date"></label></div>
+      <div class="row2"><label>Token Supervisor (novo)<input id="vt-w" type="password" autocomplete="off"></label><label>Expira em<input id="vt-we" type="date"></label></div>
+      <div class="row2"><label>Token Manager (novo)<input id="vt-a" type="password" autocomplete="off"></label><label>Expira em<input id="vt-ae" type="date"></label></div>
+      <div class="row"><button class="btn primary" type="submit" id="vt-btn">Guardar no cofre</button></div>
+      <p id="vt-msg" hidden></p>
+    </form>
   </div>
   <div class="card">
     <h2>Utilizadores</h2>
@@ -293,7 +410,7 @@
       <h3>Adicionar ou substituir utilizador</h3>
       <div class="row2"><label>Nome<input id="nu-name" type="text" required></label><label>Utilizador<input id="nu-u" type="text" autocapitalize="none" pattern="[a-zA-Z0-9._\-]{3,30}" title="3 a 30 letras, números, ponto, hífen ou _" required></label></div>
       <div class="row2"><label>Palavra-passe (mín. 10 caracteres)<input id="nu-p1" type="password" autocomplete="new-password" required></label><label>Confirmar<input id="nu-p2" type="password" autocomplete="new-password" required></label></div>
-      <label>Perfil<select id="nu-role"><option value="operador">Operador · Início, Verificar, Biblioteca, Como funciona</option><option value="supervisor">Supervisor · + Atualização</option><option value="manager">Manager · + Definições</option></select></label>
+      <label>Perfil<select id="nu-role"><option value="operador">Operador · Início, Verificar, Biblioteca, Como funciona</option><option value="supervisor">Supervisor · + Atualização e Registo</option><option value="manager">Manager · + Definições</option><option value="famag">FAMAG (fornecedor) · só verificação de machos</option></select></label>
       <div class="row"><button class="btn primary" type="submit" id="nu-btn">Adicionar utilizador</button></div>
       <p id="nu-msg" hidden></p>
     </form>
@@ -302,61 +419,7 @@
 
 <!-- ================= COMO FUNCIONA ================= -->
 <section class="view" id="v-como" hidden>
-  <div class="card">
-    <h2>Como tirar a foto</h2>
-    <div class="figure" style="margin-top:14px">
-      <svg viewBox="0 0 640 345" role="img" aria-labelledby="fig-t">
-        <title id="fig-t">Telemóvel a 90 graus por cima da caixa, com uma luz baixa de lado</title>
-        <!-- mesa e cartão -->
-        <rect x="20" y="300" width="600" height="10" rx="2" fill="var(--line-2)"/>
-        <rect x="60" y="274" width="520" height="26" rx="3" fill="var(--kraft)"/>
-        <text x="570" y="332" text-anchor="end" font-size="16" fill="var(--muted)" font-family="var(--sans)">cartão · verso da caixa</text>
-        <!-- pontos em relevo com sombra do lado oposto à luz -->
-        <g fill="var(--kraft)" stroke="var(--ink-2)" stroke-width="1.5">
-          <path d="M282 274 a14 11 0 0 1 28 0"/>
-          <path d="M326 274 a14 11 0 0 1 28 0"/>
-          <path d="M370 274 a14 11 0 0 1 28 0"/>
-        </g>
-        <g fill="var(--ink)" opacity=".5">
-          <path d="M310 274 l22 0 l-22 -9 z"/>
-          <path d="M354 274 l22 0 l-22 -9 z"/>
-          <path d="M398 274 l22 0 l-22 -9 z"/>
-        </g>
-        <!-- telemóvel -->
-        <rect x="270" y="26" width="140" height="26" rx="7" fill="var(--ink)"/>
-        <rect x="328" y="52" width="24" height="8" rx="2" fill="var(--ink-2)"/>
-        <text x="424" y="45" font-size="17" fill="var(--ink)" font-family="var(--sans)" font-weight="600">telemóvel</text>
-        <!-- eixo da câmara -->
-        <line x1="340" y1="62" x2="340" y2="258" stroke="var(--green)" stroke-width="3" stroke-dasharray="8 7"/>
-        <path d="M340 240 h18 v18" fill="none" stroke="var(--green)" stroke-width="3"/>
-        <text x="366" y="232" font-size="28" fill="var(--green)" font-family="var(--mono)" font-weight="600">90º</text>
-        <text x="354" y="150" font-size="16" fill="var(--green)" font-family="var(--sans)">câmara paralela</text>
-        <text x="354" y="170" font-size="16" fill="var(--green)" font-family="var(--sans)">ao cartão</text>
-        <!-- luz lateral -->
-        <g transform="rotate(-16 80 236)">
-          <rect x="34" y="224" width="66" height="26" rx="6" fill="var(--amber)"/>
-          <rect x="98" y="218" width="10" height="38" rx="3" fill="var(--amber)"/>
-        </g>
-        <g stroke="var(--amber)" stroke-width="2.5" stroke-linecap="round">
-          <path d="M120 232 L290 266" opacity=".95"/>
-          <path d="M120 244 L334 270" opacity=".75"/>
-          <path d="M120 222 L246 250" opacity=".55"/>
-        </g>
-        <path d="M222 274 A 66 66 0 0 0 220 256" fill="none" stroke="var(--amber)" stroke-width="2"/>
-        <text x="24" y="150" font-size="18" fill="var(--amber)" font-family="var(--sans)" font-weight="600">luz de lado, baixa</text>
-        <text x="24" y="174" font-size="16" fill="var(--amber)" font-family="var(--mono)" font-weight="600">15–30º do cartão</text>
-        <text x="440" y="236" font-size="15" fill="var(--muted)" font-family="var(--sans)">cada ponto</text>
-        <text x="440" y="254" font-size="15" fill="var(--muted)" font-family="var(--sans)">faz sombra</text>
-        <path d="M436 250 L414 268" stroke="var(--muted)" stroke-width="1.5"/>
-      </svg>
-      <ul>
-        <li><b>Telemóvel a 90º</b> da caixa, paralelo ao cartão. Fotos inclinadas dão “Inconclusivo”.</li>
-        <li><b>Luz de lado e baixa</b> (lanterna, candeeiro ou janela lateral), para cada ponto fazer sombra. Evite a luz de frente e o flash.</li>
-        <li><b>Braille grande na foto</b>: aproxime até o braille ocupar boa parte do ecrã, sem desfocar.</li>
-        <li>Fotografe o <b>verso</b> (o lado de dentro da caixa) e escolha “Verso” na app.</li>
-      </ul>
-    </div>
-  </div>
+  <div id="como-foto"></div>
   <div class="how">
     <div class="card">
       <h2>O que a app faz</h2>
@@ -381,24 +444,56 @@
       <h2>Perfis</h2>
       <ul>
         <li><b>Operador</b>: Início, Verificar, Biblioteca e Como funciona.</li>
-        <li><b>Supervisor</b>: tudo o do Operador e a Atualização da relação SAP.</li>
-        <li><b>Manager</b>: tudo o do Supervisor e as Definições (prazo, destinatários do email e utilizadores).</li>
+        <li><b>Supervisor</b>: tudo o do Operador, a Atualização da relação SAP e o Registo de todas as verificações (exportação para Excel).</li>
+        <li><b>Manager</b>: tudo o do Supervisor e as Definições (prazo, destinatários do email, utilizadores e cofre de tokens).</li>
+        <li><b>FAMAG</b> (fornecedor): só verifica machos, antes de os enviar.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>Câmara e ordem de fabrico</h2>
+      <ul>
+        <li><b>Abrir câmara</b> mostra uma moldura com a forma do braille. Encaixe o braille na moldura: a zona fica marcada sozinha.</li>
+        <li>A câmara avisa se a foto está escura ou tremida, e mostra o nível do telemóvel (verde = paralelo à caixa).</li>
+        <li><b>Ler OF</b>: fotografe a página de características da OF. A app lê, para cada MM, o código da linha <b>Braille</b> (ignora Cortante e Reserva de verniz). Se a OF tiver vários MM, toque no que está a verificar.</li>
+        <li>Se o braille da OF for diferente do da relação SAP, a app avisa.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>Machos</h2>
+      <ul>
+        <li>Em <b>Verificar › Macho</b>, indique o código do braille (1300…) e fotografe a face do macho com os pinos.</li>
+        <li>A verificação é feita em dois momentos: pela FAMAG antes de enviar e pelo PCV na receção. O registo guarda os dois.</li>
+        <li>Quando a verificação é aberta a partir da checklist da PCV Ferramentas, o resultado OK volta sozinho para a checklist.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>Relatório diário e fotos</h2>
+      <ul>
+        <li>Supervisores e Managers veem, no Registo, o relatório das 6h do dia útil anterior às 6h de hoje, com as incidências e o botão <b>Tratado</b>.</li>
+        <li>As fotos NOK ficam guardadas. As de A confirmar e Inconclusivo também, mas são apagadas se o mesmo MM der OK no mesmo dia.</li>
+        <li>Se a app errar, use <b>A app enganou-se</b> no resultado: a foto fica guardada para a afinação.</li>
       </ul>
     </div>
     <div class="card">
       <h2>Onde ficam os dados</h2>
       <ul>
-        <li>A relação SAP, a lista de PDFs e as definições ficam num repositório GitHub privado.</li>
-        <li>Os PDFs e as fotos nunca saem do dispositivo: a comparação é feita no próprio navegador.</li>
-        <li>O histórico de verificações fica guardado em cada dispositivo.</li>
+        <li>A relação SAP, o registo das verificações e as definições ficam num repositório GitHub privado.</li>
+        <li>Os PDFs são lidos diretamente da pasta 11 - PCV\00 - BRAILLES (botão “Ligar pasta”). Basta colocar lá os PDFs novos.</li>
+        <li>Nos computadores dos Supervisores e Managers, a app extrai a posição dos pontos de cada PDF novo e guarda-a no repositório privado. Assim, os tablets e a FAMAG só precisam do MM ou do código.</li>
+        <li>Os PDFs nunca saem do dispositivo: a comparação é feita no próprio navegador. Só as fotos com problemas ficam guardadas no repositório privado.</li>
+        <li>Cada verificação fica no registo partilhado (MM, braille, ficheiro, data, utilizador, resultado e notas). Se não houver rede, fica guardada no dispositivo e é enviada depois.</li>
       </ul>
     </div>
   </div>
 </section>
 </main>
 
+<div class="modal" id="modal" hidden><div class="modal-box"><button class="modal-x" id="modal-x" aria-label="Fechar">✕</button><div id="modal-body"></div></div></div>
+
 <script src="js/vision.js"></script>
 <script src="js/data.js"></script>
+<script src="js/camera.js"></script>
+<script src="js/ocr.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

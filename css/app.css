@@ -90,7 +90,9 @@ main{padding-block:20px 60px}
 .chip{border:1px solid var(--line-2);background:var(--sunken);border-radius:999px;padding:6px 15px;font-size:15px;cursor:pointer}
 .chip:hover,.chip[aria-pressed="true"]{border-color:var(--green);color:var(--green);background:var(--green-soft)}
 
-/* aviso no topo */
+/* avisos no topo */
+.banners{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+label.chip{display:inline-flex;align-items:center}
 .banner{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;border:1px solid var(--amber-line);background:var(--amber-soft);border-radius:var(--r);padding:14px 18px}
 .banner b{color:var(--amber)}
 .banner.red{border-color:var(--red-line);background:var(--red-soft)} .banner.red b{color:var(--red)}
@@ -238,6 +240,7 @@ mark{background:var(--green-soft);color:var(--green);border-radius:3px;padding:0
 .figure ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:10px;color:var(--ink-2)}
 .figure ul b{color:var(--ink)}
 
+.credits{margin-top:8px;text-align:center;font-size:11px;letter-spacing:.02em;color:var(--muted);opacity:.55}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:10px;font-size:14px;z-index:50;max-width:calc(100vw - 32px)}
 .spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--line-2);border-top-color:var(--green);border-radius:50%;animation:sp .8s linear infinite;vertical-align:-3px;margin-right:8px}
 @keyframes sp{to{transform:rotate(360deg)}}
@@ -245,3 +248,47 @@ mark{background:var(--green-soft);color:var(--green);border-radius:3px;padding:0
 
 @media (max-width:1100px){.steps{grid-template-columns:minmax(0,1fr)}.grid3{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.grid2{grid-template-columns:minmax(0,1fr)}}
 @media (max-width:760px){.hero{grid-template-columns:minmax(0,1fr)}.hero canvas{min-height:200px}.grid3,.how,.figure,.diff{grid-template-columns:minmax(0,1fr)}.bar{gap:12px}.app-name{border-left:0;padding-left:0}nav.tabs button{font-size:15px;padding:8px 12px}.stats{grid-template-columns:repeat(3,minmax(0,1fr))}.pill b{font-size:22px}.card{padding:16px}.hero .txt{padding:24px 20px}.form .row2{grid-template-columns:minmax(0,1fr)}}
+
+/* ---------- modo caixa/macho, OF, avisos ---------- */
+.step-h h2{flex:1}
+.seg.mode button{padding:6px 12px;font-size:13px}
+.bad-txt{color:var(--red)}
+.ofpick{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px;text-align:left;border:1px solid var(--line-2);background:var(--surface);border-radius:10px;padding:10px 12px;margin-top:6px;cursor:pointer;font:inherit;color:inherit}
+.ofpick:hover{border-color:var(--green)}
+.ofpick.warn{border-color:var(--amber-line);background:var(--amber-soft)}
+.ofpick small{flex-basis:100%;color:var(--muted)}
+.ofpick small.bad-txt{color:var(--red)}
+#rep-days .chip b{margin-left:4px}
+
+/* ---------- janela modal ---------- */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:grid;place-items:center;z-index:60;padding:16px}
+.modal[hidden]{display:none}
+.modal-box{background:var(--surface);color:var(--ink);border-radius:var(--r);padding:22px;max-width:640px;width:100%;max-height:calc(100vh - 32px);overflow:auto;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.modal-x{position:absolute;top:10px;right:10px;border:0;background:transparent;font-size:18px;cursor:pointer;color:var(--muted)}
+
+/* ---------- câmara com moldura ---------- */
+body.cam-open{overflow:hidden}
+.cam{position:fixed;inset:0;background:#000;color:#fff;z-index:80;display:flex;flex-direction:column}
+.cam[hidden]{display:none}
+.cam-top{display:flex;align-items:center;gap:10px;padding:calc(10px + env(safe-area-inset-top,0px)) 14px 10px}
+.cam-top b{font-size:16px}
+.cam-sub{font-size:13px;opacity:.75;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cam-x{border:0;background:rgba(255,255,255,.15);color:#fff;width:38px;height:38px;border-radius:50%;font-size:16px;cursor:pointer;margin-left:auto}
+.cam-stage{position:relative;flex:1;overflow:hidden;min-height:0}
+.cam-stage video,.cam-stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cam-stage canvas{position:absolute;inset:0;pointer-events:none}
+.cam-bar{padding:12px 14px calc(14px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:10px;background:#0c0f0d}
+.cam-ind{display:flex;gap:8px;flex-wrap:wrap}
+.cam-ind .ind{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.12)}
+.cam-ind .ind.good{background:#1f7d46}
+.cam-ind .ind.bad{background:#b8322a}
+.cam-ind .ind i{width:12px;height:12px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.25);display:inline-block}
+.cam-msg{font-size:14px;line-height:1.4;opacity:.9}
+.cam-msg.bad{color:#ffb4ac}
+.cam-msg.good{color:#9be3b4}
+.cam-btns{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.cam-btns .cam-gal{min-width:90px}
+.cam-btns .btn{color:var(--ink)}
+.cam-shot{width:70px;height:70px;border-radius:50%;border:5px solid #fff;background:#2fbf62;cursor:pointer;flex:none}
+.cam-shot:disabled{background:#555;cursor:not-allowed}
+#cam-review{justify-content:center}
