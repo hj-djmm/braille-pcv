@@ -1,13 +1,49 @@
 {
- "version": 1,
+ "version": 2,
+ "vault": {
+  "roles": {
+   "operador": {
+    "iv": "I05ZVa2dYs67Ikfp",
+    "ct": "2pN44pXadJS6V/DtsbaZS+8oEJGSNYsW45bSAGBbQliOM/pasT4Bh6xGVQgayJrnQRt5LGJ05xM6YUSDCe/LYqPkWeyfSq4gt0kfBvNotJQuXFzQj3ff5HqZmnbT/NG9krV5gcQ/WKy41WIuGY67jGYEfV5Blchy"
+   },
+   "supervisor": {
+    "iv": "4TaNZi+sn50auq3V",
+    "ct": "VKrD3yiW0IF4egzPy54kWdcZmxbv4ra+De3q4Srhk5xwunBMB05edYV99fXZscsQOlOnjl6+Q3jTg31jvBXzgunmRt2X/2meVvqPl5Cn6MXMLyDp/+CJiu9o3rYw647+PIejDWSGseWRwzd/BLMW0C9j6TSGfd7VSfJaVIWC5sK9Ac77raZuuwiEFqfo9ERAdSCX6wsjgb1wc35iy5TbKzLAzor6dNKx3C9CpY8Y5z7pwC3ZEHNR8PWYCg95TzA9usNQjt/SfcNeqmQ8BMTatPyttGhmnyfuOXX3RE5nXYg="
+   },
+   "manager": {
+    "iv": "b03WYp0GVeJ1R0gU",
+    "ct": "fbZFYLjlGTQxX/YAjwwjVtc6h2Vy5zCrxnATqZAU6C3pw0TswLXDCT6A76+uulyH7RBUarCtVKmk3myoNny9lxSeOfvdTKixHo7S4sqUik1jeRh90o63m0qFSDvZ51gayGpuoJvHmWiJCffC9jizMNTiFZ191FrJjnmXFpzZfqGxtFdl0ZXQdN7yrAqVxcDvkezz0PEcCJHrnvU0YZ0gReTF1h4IV2jPUDhOHeL34v8iKcq8s9kae8ltg51YBAcrNfQO3m5az9iyaScZGI3QobBEbXuMNCJCpcKCfh32Wss0Cd95zBrG4NqcJan6UQ5pG3tBTLr3C+eaVC+thZb3yC9tcAXV1xN2mraoZcQLHJzDqJ+NRP1Q3MSUGOhs9XZx6WnXCdYfMu8iLlKiZwUosVVFyS0lknJ87/vrRwXZUu+LvPeuAgCmLQ=="
+   },
+   "famag": {
+    "iv": "p2uTgCmR3EKrHUW1",
+    "ct": "Yu4R/rCZOGKuoEi/+u07ullHaGxRSXuXSsf1x7QdD+9qkycFBxCLiIQI4/14Tg45uMtWY0MJPUhgX5B4wlvlMQEd2jgrCjEGan+2KhRusD59VQy81lwepQwML/Ir+T60eJ3X7sNOxA5www0rEY2ELOr5OZ6G2coY"
+   }
+  },
+  "renewed": "2026-11-26T18:43:48.408Z",
+  "legacy": {
+   "operador": {
+    "iv": "lQwE7hDjPuISAmXS",
+    "ct": "R9eblwJ1qnh1p/9E2+7AZJdC9Ai1NE7+kjD3YumntRzQW3hyi+FLXkCwS4ZT3Eh3U3QpWe7oSt55Y7YN4YVNAEYpdJksi61nf6HPhIZUx6Tp4/YG"
+   },
+   "supervisor": {
+    "iv": "JhWo0SMm556/6qXs",
+    "ct": "+HBfXCZSGKmUu6aAsSHLPCGQZFE8G+U6Th8fw1tsT3XHXdT6M6zGoC5PE35Q37lfI06sjXFfVZ8hUGX1C4QqGK2S2VH/dShZwE5WJzJnp64ywRdZbcU="
+   },
+   "manager": {
+    "iv": "H6QxYx/rCp1P+fjf",
+    "ct": "KVoaImcT94nESDJKE7T+Py5hsjIzIyqa++WJAoGieWKV/Yr98MMenS/1pxc5ROIDB2zHTuol1cQRPfHTWjrqT852yNdq/6iGPSThwYtZMBSfIDUVaWLyCcxs9Kon1qHm1gLr68BSmp2kfnPJRcqBrN8sXvYFb3fXr4r0i1uh2X2od8sL4i+oo5/M9OPA3hKXn56K+i9js+SvRPlh8GizeYYZt5l9L6YLN0RqR/yqogfOHs1HlEiYPTjK1xvbKdXUWdAdD83CUmnQZ1rP16DiA0bQXhyG8mxNp/JU/9sSjhz/Wc/A7bQnOhGryR7E50tMx+4kQ8slz2WuhmAgHjXLBg=="
+   }
+  }
+ },
  "users": [
   {
+   "v": 2,
    "u": "e00629",
    "name": "David Malheiro",
    "role": "manager",
-   "salt": "UDiBjf4P9iLTNglWCACCSQ==",
-   "iv": "7x3nlTntfOpIBhb3",
-   "ct": "dUI36SQE7DujKOJbEqafAEnkEaq/j53wMBqU8yi4ebZo0WDP2GNgf/4U23Zd6D/CvUe8ETBcUggqG57v9YBI4iHI3k75XJCXP8EJiakftm1zGtLXct9I71PYKVSTG1a3+POEGtLG4+cKdP9+XTWoz4gnmilnJvNAaA8SNzGLacOz3auxyHEBANUTAkPQzjJLCb2ZMNFHmR+0bzxgkrIYcWvImWJbBhJp+bYaK73mgesrIOG6pWiPa8QgQjIHNXAqOG0nE91axmYu6uaWksH4uli8d2Uu2QjmthBPPvq/9nWvGJcOzGawODk1piP73xhs/4IbmkrFThpXZfAN5aDHvIGrabxUfoC+LpmoL4NLTgJsPxfe84YPzjZVTvF2QIceo72Ficki4aYYLVqi6IS+usCwYoE/Q737AyauoIUsa1z/41ngDBU4DwDiKRLPwncH/zdh9Cp1tGzir1BFbk/HJdpt2dom2UAVQceUxJGBGB3F",
+   "salt": "bT37lRzvuooabo9eb0WGEg==",
+   "iv": "gvUzfTyZhWejA1tC",
+   "ct": "RotAJE6GpxNjJi3vRWiY5tNm0OLVULvbE3JDaw+88OAk3ntp9erbGzK4zW+NcXTtIr9c386MUKc8cYrn5Gdf8IzWfSmm0ibJzpJFh1a5l/mb4ioz3S5PY3u5IS8Hkv8qIiQnEU/+6UM+Weuflce0bbt/xIAm9kMAuR4+FWZbEKM7hv7SZGtAg1zXiArzW7Iwg4i5pkO68lrZVUwrOi/EYQ6hQu0BkETo0Ecilkg/SWt46PFarDN5Ky7Uq2pdrEuh63QP2swB992rXA3xAcV6os66Yu9s3WqIdh6VMLtyAIM1JjazA/Z/ee3aGcHGWHTj+FKZsXG59Ppu5MlWwCuCyRJSP09IZayl9k1pHTQqNDdlXCMeM9AP29kwhY1rUA==",
    "created": "2026-11-25T17:37:24.326Z"
   },
   {
