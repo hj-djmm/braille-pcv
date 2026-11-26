@@ -51,7 +51,7 @@ function makePattern(pts, name, source, dotD) {
   else { const f = fitPeriod(ys, ds, 3, [minY, minY - ds, minY - 2 * ds], 30 * ds, 30 * ds); y0 = f.base; }
   const fx = fitPeriod(xs, ds, 2, [minX, minX - ds], 2.0 * ds, 3.6 * ds);
   const x0 = fx.base, Cp = fx.P;
-  const nL = Math.round((Math.max(...pts.map(p => p.Y)) - y0 - 2 * ds) / Lp) + 1;
+  const nL = Math.max(...pts.map(p => Math.max(0, Math.floor((p.Y - y0 + 0.5 * ds) / Lp)))) + 1;
   const cells = Array.from({ length: nL }, () => []);
   pts.forEach(p => {
     const l = Math.max(0, Math.floor((p.Y - y0 + 0.5 * ds) / Lp));
@@ -77,18 +77,20 @@ async function extractPattern(buf, name) {
   for (let pn = 1; pn <= Math.min(pdf.numPages, 2); pn++) {
     const page = await pdf.getPage(pn);
     const ol = await page.getOperatorList();
-    let ctm = [1, 0, 0, 1, 0, 0]; const st = []; let pend = [];
+    let ctm = [1, 0, 0, 1, 0, 0], col = "?"; const st = []; let pend = [];
     const FILL = new Set([O.fill, O.eoFill, O.fillStroke, O.eoFillStroke, O.closeFillStroke, O.closeEOFillStroke]);
     const STROKE = new Set([O.stroke, O.closeStroke]);
+    const COLOR = new Set([O.setFillRGBColor, O.setFillGray, O.setFillCMYKColor, O.setFillColor, O.setFillColorN].filter(v => v != null));
     for (let i = 0; i < ol.fnArray.length; i++) {
       const fn = ol.fnArray[i], a = ol.argsArray[i];
-      if (fn === O.save) st.push(ctm);
-      else if (fn === O.restore) ctm = st.pop() || ctm;
+      if (fn === O.save) st.push([ctm, col]);
+      else if (fn === O.restore) { const s = st.pop(); if (s) [ctm, col] = s; }
       else if (fn === O.transform) ctm = U.transform(ctm, a);
-      else if (fn === O.paintFormXObjectBegin) { st.push(ctm); if (a && a[0]) ctm = U.transform(ctm, a[0]); }
-      else if (fn === O.paintFormXObjectEnd) ctm = st.pop() || ctm;
+      else if (fn === O.paintFormXObjectBegin) { st.push([ctm, col]); if (a && a[0]) ctm = U.transform(ctm, a[0]); }
+      else if (fn === O.paintFormXObjectEnd) { const s = st.pop(); if (s) [ctm, col] = s; }
+      else if (COLOR.has(fn)) col = JSON.stringify(a);
       else if (fn === O.constructPath) pend = pend.concat(pathCircles(a[0], a[1], ctm));
-      else if (FILL.has(fn)) { pend.forEach(c => { c.filled = true; all.push(c); }); pend = []; }
+      else if (FILL.has(fn)) { pend.forEach(c => { c.filled = true; c.col = col; all.push(c); }); pend = []; }
       else if (STROKE.has(fn)) { pend.forEach(c => { c.filled = false; all.push(c); }); pend = []; }
       else if (fn === O.endPath) pend = [];
     }
@@ -99,22 +101,76 @@ async function extractPattern(buf, name) {
   let dots = all.filter(c => c.filled && plausible(c)), source = "pontos preenchidos (camada Braille)";
   if (dots.length < 3) { dots = all.filter(c => !c.filled && plausible(c)); source = "círculos com contorno (confirmar!)"; }
   if (dots.length < 3) throw new Error("Não encontrei pontos de braille neste PDF. Confirma que é o PDF vetorial do braille (ArtPro) e não uma imagem digitalizada.");
+  dots = dropMatrix(dots);
   const md = median(dots.map(c => c.d));
   dots = dots.filter(c => c.d > md * 0.75 && c.d < md * 1.33);
   const uniq = [];
   for (const c of dots) if (!uniq.some(u => Math.hypot(u.x - c.x, u.y - c.y) < 0.5)) uniq.push(c);
   let pts = uniq.map(c => ({ X: c.x * MM, Y: -c.y * MM }));
   const ds = modeOf(nnDists(pts), 0.04), nn = nnDists(pts);
-  pts = pts.filter((p, i) => nn[i] < 4 * ds);
-  const mnx = Math.min(...pts.map(p => p.X)), mny = Math.min(...pts.map(p => p.Y));
-  pts.forEach(p => { p.X -= mnx; p.Y -= mny; });
-  return makePattern(pts, name, source, md * MM);
+  pts = pts.filter((p, i) => nn[i] < 6 * ds);
+  const stats = { filled: all.filter(c => c.filled && plausible(c)).length, stroked: all.filter(c => !c.filled && plausible(c)).length };
+  return patternFromPoints(pts, name, source, md * MM, stats);
+}
+/* Alguns PDFs desenham também a matriz completa (todas as 6 posições de cada célula) noutra cor.
+   A camada com quase todas as células cheias é a matriz e é descartada. */
+function dropMatrix(dots) {
+  const groups = new Map(); dots.forEach(c => { const k = c.col || "?"; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(c); });
+  if (groups.size < 2) return dots;
+  const fullness = g => { const P = g.map(c => ({ X: c.x, Y: c.y })), ds = modeOf(nnDists(P), 0.1); let s = 0;
+    P.forEach((p, i) => { let k = 0; P.forEach((q, j) => { if (i !== j) { const d = Math.hypot(p.X - q.X, p.Y - q.Y); if (d > 0.8 * ds && d < 1.2 * ds) k++; } }); s += k; }); return s / P.length; };
+  const scored = [...groups.values()].filter(g => g.length >= 6).map(g => ({ g, f: fullness(g) }));
+  const keep = scored.filter(x => x.f < 2.2);
+  return keep.length && keep.length < scored.length ? keep.flatMap(x => x.g) : dots;
+}
+/* Um PDF pode ter vários blocos de braille (faces diferentes da caixa, por vezes rodados entre si).
+   Cada bloco vira um padrão próprio; a foto é comparada com o bloco que melhor alinhar. */
+function splitBlocks(pts, ds) {
+  // dentro de um bloco, um espaço entre palavras pode afastar pontos até ~6 ds; blocos de faces diferentes ficam muito mais longe
+  const n = pts.length, lab = new Array(n).fill(-1), lim = 8.5 * ds; let k = 0;
+  for (let i = 0; i < n; i++) {
+    if (lab[i] >= 0) continue; lab[i] = k; const st = [i];
+    while (st.length) { const a = st.pop(); for (let j = 0; j < n; j++) if (lab[j] < 0 && Math.hypot(pts[j].X - pts[a].X, pts[j].Y - pts[a].Y) <= lim) { lab[j] = k; st.push(j); } }
+    k++;
+  }
+  const groups = Array.from({ length: k }, () => []); pts.forEach((p, i) => groups[lab[i]].push({ X: p.X, Y: p.Y }));
+  return groups.filter(g => g.length >= 6);
+}
+function patternFromPoints(pts, name, source, dotD, stats) {
+  const ds = modeOf(nnDists(pts), 0.04);
+  const groups = splitBlocks(pts, ds);
+  if (groups.length <= 1) { const P = orientPattern(groups[0] || pts, name, source, dotD); P.stats = stats; P.blocks = [P]; P.block = 0; return P; }
+  // ordem de leitura: de cima para baixo, da esquerda para a direita (no PDF)
+  groups.sort((a, b) => (Math.min(...a.map(p => p.Y)) - Math.min(...b.map(p => p.Y))) || (Math.min(...a.map(p => p.X)) - Math.min(...b.map(p => p.X))));
+  const blocks = groups.map((g, i) => { const B = orientPattern(g, name, source, dotD); B.block = i; B.stats = stats; return B; });
+  blocks.forEach(B => { B.blocks = blocks; });
+  return blocks[0];
+}
+const blockLabel = B => B.blocks && B.blocks.length > 1 ? `bloco ${B.block + 1} de ${B.blocks.length}` : "";
+/* O braille pode estar rodado no PDF (90º, 180º, 270º). Escolhe a rotação em que os pontos
+   caem melhor numa grelha de células 2×3 e em que mais células são letras conhecidas. */
+const KNOWN = new Set(Object.keys(MASK2CH).map(Number));
+function orientPattern(pts0, name, source, dotD) {
+  const rots = [p => [p.X, p.Y], p => [p.Y, -p.X], p => [-p.X, -p.Y], p => [-p.Y, p.X]];
+  let best = null;
+  rots.forEach((f, k) => {
+    const pts = pts0.map(p => { const [X, Y] = f(p); return { X, Y }; });
+    const mnx = Math.min(...pts.map(p => p.X)), mny = Math.min(...pts.map(p => p.Y));
+    pts.forEach(p => { p.X -= mnx; p.Y -= mny; });
+    let P; try { P = makePattern(pts, name, source, dotD); } catch (e) { return; }
+    const err = pts.reduce((s, p) => { const q = P.pos(p.l, p.c, p.n - 1); return s + Math.hypot(q.X - p.X, q.Y - p.Y); }, 0) / pts.length / P.ds;
+    const cells = P.cells.flat().filter(m => m), known = cells.filter(m => KNOWN.has(m)).length / Math.max(1, cells.length);
+    const score = err - 0.25 * known;
+    if (!best || score < best.score) { best = { score, P }; P.rot = k * 90; }
+  });
+  if (!best) throw new Error("Não consegui organizar os pontos deste PDF em células de braille.");
+  return best.P;
 }
 function pathCircles(ops, co, ctm) {
   const O = pdfjsLib.OPS, out = []; let j = 0, cur = null;
   const add = (x, y) => { if (!cur) cur = { a: x, b: x, c: y, d: y, curves: 0, lines: 0 }; else { cur.a = Math.min(cur.a, x); cur.b = Math.max(cur.b, x); cur.c = Math.min(cur.c, y); cur.d = Math.max(cur.d, y); } };
   const flush = () => {
-    if (cur && cur.curves >= 3 && cur.lines <= 1) {
+    if (cur && cur.curves >= 3 && cur.lines <= Math.max(1, cur.curves - 1)) {
       const w = cur.b - cur.a, h = cur.d - cur.c;
       if (w > 0.2 && h > 0.2 && w / h > 0.8 && w / h < 1.25) {
         const p = pdfjsLib.Util.applyTransform([(cur.a + cur.b) / 2, (cur.c + cur.d) / 2], ctm);
@@ -293,6 +349,47 @@ function register(P, dets, dsPx, side, scaleRange, quads) {
   return { H, rf, theta, s, kind, rms, coarseScore: best.score, dsx, dsy, pxPerMM };
 }
 
+/* Cada linha pode estar ligeiramente deslocada em relação ao PDF (ex.: a 2.ª linha começa uma
+   célula antes, ou o entrelinhamento é um pouco diferente). O conteúdo continua a ter de bater
+   ponto a ponto; só a posição da linha é acertada, e a diferença fica registada. */
+function lineShifts(P, R, dets) {
+  const Hi = inv3(R.H), ds = P.ds;
+  const M = dets.map(d => { const [X, Y] = apply(Hi, d.x, d.y); return { X, Y }; });
+  const pos = (l, c, b, sx, sy) => { const q = P.pos(l, c, 0); return [q.X + sx + (b >= 3 ? R.dsx : 0), q.Y + sy + (b % 3) * R.dsy]; };
+  const near = (x, y, r) => { let bi = -1, bd = r; M.forEach((m, i) => { const d = Math.hypot(m.X - x, m.Y - y); if (d < bd) { bd = d; bi = i; } }); return [bi, bd]; };
+  const score = (l, sx, sy) => {
+    const row = P.cells[l], used = new Set(); let hit = 0, extra = 0;
+    for (let c = 0; c < row.length; c++) for (let b = 0; b < 6; b++) {
+      const [x, y] = pos(l, c, b, sx, sy), [i] = near(x, y, ds * 0.35);
+      if (i < 0) continue; used.add(i);
+      if (row[c] & (1 << b)) hit++; else extra++;
+    }
+    return { s: hit - extra, hit };
+  };
+  return P.cells.map((row, l) => {
+    const nDots = row.reduce((a, m) => a + popcount(m), 0);
+    const base = score(l, 0, 0); let best = { x: 0, y: 0, ...base };
+    for (let k = -3; k <= 3; k++) for (const fy of [-0.5, 0, 0.5]) {
+      if (!k && !fy) continue;
+      const sc = score(l, k * P.Cp, fy * ds);
+      if (sc.s > best.s) best = { x: k * P.Cp, y: fy * ds, ...sc };
+    }
+    // só se aceita um deslocamento que explique claramente melhor a linha
+    if (best.s - base.s < Math.max(3, nDots * 0.15)) best = { x: 0, y: 0, ...base };
+    // afinação fina: mediana dos resíduos dos pontos encontrados
+    for (let it = 0; it < 2; it++) {
+      const rx = [], ry = [];
+      for (let c = 0; c < row.length; c++) for (let b = 0; b < 6; b++) if (row[c] & (1 << b)) {
+        const [x, y] = pos(l, c, b, best.x, best.y), [i] = near(x, y, ds * 0.4);
+        if (i >= 0) { rx.push(M[i].X - x); ry.push(M[i].Y - y); }
+      }
+      if (rx.length >= 3) { best.x += Math.max(-0.4 * ds, Math.min(0.4 * ds, median(rx))); best.y += Math.max(-0.4 * ds, Math.min(0.4 * ds, median(ry))); }
+    }
+    return { x: best.x, y: best.y, cells: Math.round(best.x / P.Cp) };
+  });
+}
+const popcount = m => { let n = 0; while (m) { n += m & 1; m >>= 1; } return n; };
+
 /* ================= Comparação completa ================= */
 function compare(P, im, box, side, sens) {
   const t0 = performance.now();
@@ -310,9 +407,10 @@ function compare(P, im, box, side, sens) {
     k *= TARGET / dsPx;
   }
   const maxCells = Math.max(...P.cells.map(r => r.length));
+  const shifts = lineShifts(P, R, D.dets);
   const G = [];
-  P.cells.forEach((row, l) => { const n = Math.min(maxCells, row.length + 1); for (let c = 0; c < n; c++) for (let b = 0; b < 6; b++) {
-    const q = P.pos(l, c, 0), X = q.X + (b >= 3 ? R.dsx : 0), Y = q.Y + (b % 3) * R.dsy; const [u, v] = apply(R.H, X, Y);
+  P.cells.forEach((row, l) => { const n = Math.min(maxCells, row.length + 1), sh = shifts[l]; for (let c = 0; c < n; c++) for (let b = 0; b < 6; b++) {
+    const q = P.pos(l, c, 0), X = q.X + sh.x + (b >= 3 ? R.dsx : 0), Y = q.Y + sh.y + (b % 3) * R.dsy; const [u, v] = apply(R.H, X, Y);
     G.push({ l, c, b, u, v, exp: !!((row[c] || 0) & (1 << b)), det: null, dd: Infinity }); } });
   // cada ponto detetado conta só para a posição da grelha mais próxima
   const atol = dsPx * 0.4;
@@ -323,7 +421,8 @@ function compare(P, im, box, side, sens) {
     const e = energyAt(D, g.u, g.v, dsPx * 0.15);
     let st;
     if (e < 0) st = "doubt";
-    else if (g.exp) st = g.det || e / ref >= 0.5 ? "ok" : e / ref >= 0.3 ? "doubt" : "miss";
+    // ponto esperado fraco mas com um pico de energia no sítio certo (máximo local, mesmo abaixo do limiar) conta como encontrado
+    else if (g.exp) st = g.det || e / ref >= 0.5 || (e / ref >= 0.38 && D.all.some(p => Math.hypot(p.x - g.u, p.y - g.v) < dsPx * 0.25)) ? "ok" : e / ref >= 0.3 ? "doubt" : "miss";
     else if (g.det) st = g.det.e / ref >= 0.45 ? "extra" : "doubt";
     else st = e / ref >= 0.65 ? "doubt" : "none";
     const key = g.l + ":" + g.c;
@@ -341,11 +440,41 @@ function compare(P, im, box, side, sens) {
   const res = { P, R, W, D, dsPx, lines, expected: P.pts.length, ok: cnt("ok"), miss: cnt("miss"), extra: cnt("extra"), doubt: cnt("doubt"),
     errCells: lines.flat().filter(c => c.err).length, ms: Math.round(performance.now() - t0) };
   res.alignFrac = res.ok / res.expected;
+  // deslocamentos de linha relevantes (≥ 1 mm ou uma célula inteira), relativos à 1.ª linha
+  const f0 = shifts[0] || { x: 0, y: 0 };
+  res.shifts = shifts.map((s, l) => ({ l, cells: Math.round((s.x - f0.x) / P.Cp), dx: s.x - f0.x, dy: s.y - f0.y }))
+    .filter(s => s.l > 0 && (s.cells !== 0 || Math.hypot(s.dx, s.dy) >= 1));
   res.mmErr = R.rms / dsPx * P.ds;
   res.verdict = res.alignFrac < 0.6 ? "inc" : res.errCells > 0 ? "nok" : res.doubt > 0 ? "chk" : "ok";
   res.readText = lines.map(l => l.map(c => maskChar(c.read) || " ").join("")).join(" / ");
   return res;
 }
 
-window.Vision = { LETTERS, maskChar, makePattern, patternText, extractPattern, compare, median };
+/* compara com todos os blocos do PDF e fica com o que melhor alinhar */
+function compareBest(P, im, box, side, sens) {
+  const blocks = P.blocks && P.blocks.length > 1 ? P.blocks : [P];
+  let best = null, lastErr = null;
+  for (const B of blocks) {
+    try { const r = compare(B, im, box, side, sens); if (!best || r.alignFrac - (r.errCells ? 0.02 * r.errCells : 0) > best.alignFrac - (best.errCells ? 0.02 * best.errCells : 0)) best = r; }
+    catch (e) { lastErr = e; }
+  }
+  if (!best) throw lastErr || new Error("Não foi possível comparar.");
+  best.blockInfo = blockLabel(best.P);
+  return best;
+}
+/* padrão guardado (pontos já orientados, em mm) → padrão */
+function fromStored(e) {
+  const mk = (dots, i, n) => { const B = makePattern(dots.map(([X, Y]) => ({ X, Y })), e.name, (e.source || "pontos preenchidos (camada Braille)") + " · sincronizado", e.dotD || 1.6); B.block = i; return B; };
+  const list = (e.blocks || [e.dots]).map((d, i, a) => mk(d, i, a.length));
+  list.forEach(B => { B.blocks = list; });
+  return list[0];
+}
+/* padrão → forma compacta para guardar (pontos arredondados a 0,01 mm) */
+function toStored(P) {
+  const r = v => Math.round(v * 100) / 100;
+  const blocks = (P.blocks || [P]).map(B => B.pts.map(p => [r(p.X), r(p.Y)]));
+  return { name: P.name, source: P.source, dotD: r(P.dotD || 1.6), n: blocks.reduce((a, b) => a + b.length, 0), blocks };
+}
+
+window.Vision = { LETTERS, maskChar, makePattern, patternText, extractPattern, compare, compareBest, fromStored, toStored, blockLabel, median };
 })();
